@@ -12,12 +12,13 @@ import (
 
 // Vertex on 2D plane
 type Vertex struct {
+	Index int
 	X float64
 	Y float64
 }
 
 // Vertex representing lack of vertex (or bad vertex)
-var NO_VERTEX = Vertex{math.Inf(1), math.Inf(1)}
+var NO_VERTEX = Vertex{X:math.Inf(1), Y:math.Inf(1)}
 
 // For sort interface
 type Vertices []Vertex

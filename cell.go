@@ -3,7 +3,7 @@
 
 // Author: Przemyslaw Szczepaniak (przeszczep@gmail.com)
 // Port of Raymond Hill's (rhill@raymondhill.net) javascript implementation 
-// of Steven  Forune's algorithm to compute Voronoi diagrams
+// of Steven Forune's algorithm to compute Voronoi diagrams
 
 package voronoi
 
@@ -25,9 +25,6 @@ func (t *Cell) prepare() int {
 	halfedges := t.Halfedges
 	iHalfedge := len(halfedges) - 1
 
-	// get rid of unused halfedges
-	// rhill 2011-05-27: Keep it simple, no point here in trying
-	// to be fancy: dangling edges are a typically a minority.
 	for ; iHalfedge >= 0; iHalfedge-- {
 		edge := halfedges[iHalfedge].Edge
 

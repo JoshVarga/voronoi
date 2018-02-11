@@ -167,11 +167,10 @@ func (s *Voronoi) removeBeachsection(beachsection *Beachsection) {
 	circle := beachsection.circleEvent
 	x := circle.x
 	y := circle.ycenter
-	vertex := Vertex{x, y}
+	vertex := Vertex{X:x, Y: y}
 	previous := beachsection.node.previous
 	next := beachsection.node.next
 	disappearingTransitions := BeachsectionPtrs{beachsection}
-	abs_fn := math.Abs
 
 	// remove collapsed beachsection from beachline
 	s.detachBeachsection(beachsection)
@@ -188,8 +187,8 @@ func (s *Voronoi) removeBeachsection(beachsection *Beachsection) {
 	// look left
 	lArc := previous.value.(*Beachsection)
 	for lArc.circleEvent != nil &&
-		abs_fn(x-lArc.circleEvent.x) < 1e-9 &&
-		abs_fn(y-lArc.circleEvent.ycenter) < 1e-9 {
+		math.Abs(x-lArc.circleEvent.x) < 1e-9 &&
+		math.Abs(y-lArc.circleEvent.ycenter) < 1e-9 {
 
 		previous = lArc.node.previous
 		disappearingTransitions.appendLeft(lArc)
@@ -206,8 +205,8 @@ func (s *Voronoi) removeBeachsection(beachsection *Beachsection) {
 	// look right
 	var rArc = next.value.(*Beachsection)
 	for rArc.circleEvent != nil &&
-		abs_fn(x-rArc.circleEvent.x) < 1e-9 &&
-		abs_fn(y-rArc.circleEvent.ycenter) < 1e-9 {
+		math.Abs(x-rArc.circleEvent.x) < 1e-9 &&
+		math.Abs(y-rArc.circleEvent.ycenter) < 1e-9 {
 		next = rArc.node.next
 		disappearingTransitions.appendRight(rArc)
 		s.detachBeachsection(rArc) // mark for reuse
@@ -424,7 +423,7 @@ func (s *Voronoi) addBeachsection(site Vertex) {
 		d := 2 * (bx*cy - by*cx)
 		hb := bx*bx + by*by
 		hc := cx*cx + cy*cy
-		vertex := Vertex{(cy*hb-by*hc)/d + ax, (bx*hc-cx*hb)/d + ay}
+		vertex := Vertex{X:(cy*hb-by*hc)/d + ax,Y: (bx*hc-cx*hb)/d + ay}
 
 		lCell := s.getCell(LeftSite)
 		cell := s.getCell(site)
@@ -635,19 +634,19 @@ func connectEdge(edge *Edge, bbox BBox) bool {
 		// downward
 		if lx > rx {
 			if va == NO_VERTEX {
-				va = Vertex{fx, yt}
+				va = Vertex{X:fx,Y: yt}
 			} else if va.Y >= yb {
 				return false
 			}
-			vb = Vertex{fx, yb}
+			vb = Vertex{X:fx, Y:yb}
 			// upward
 		} else {
 			if va == NO_VERTEX {
-				va = Vertex{fx, yb}
+				va = Vertex{X:fx, Y:yb}
 			} else if va.Y < yt {
 				return false
 			}
-			vb = Vertex{fx, yt}
+			vb = Vertex{X:fx, Y:yt}
 		}
 		// closer to vertical than horizontal, connect start point to the
 		// top or bottom side of the bounding box
@@ -655,19 +654,19 @@ func connectEdge(edge *Edge, bbox BBox) bool {
 		// downward
 		if lx > rx {
 			if va == NO_VERTEX {
-				va = Vertex{(yt - fb) / fm, yt}
+				va = Vertex{X:(yt - fb) / fm, Y: yt}
 			} else if va.Y >= yb {
 				return false
 			}
-			vb = Vertex{(yb - fb) / fm, yb}
+			vb = Vertex{X:(yb - fb) / fm, Y:yb}
 			// upward
 		} else {
 			if va == NO_VERTEX {
-				va = Vertex{(yb - fb) / fm, yb}
+				va = Vertex{X:(yb - fb) / fm, Y: yb}
 			} else if va.Y < yt {
 				return false
 			}
-			vb = Vertex{(yt - fb) / fm, yt}
+			vb = Vertex{X:(yt - fb) / fm, Y: yt}
 		}
 		// closer to horizontal than vertical, connect start point to the
 		// left or right side of the bounding box
@@ -675,19 +674,19 @@ func connectEdge(edge *Edge, bbox BBox) bool {
 		// rightward
 		if ly < ry {
 			if va == NO_VERTEX {
-				va = Vertex{xl, fm*xl + fb}
+				va = Vertex{X:xl,  Y: fm*xl + fb}
 			} else if va.X >= xr {
 				return false
 			}
-			vb = Vertex{xr, fm*xr + fb}
+			vb = Vertex{X:xr, Y:fm*xr + fb}
 			// leftward
 		} else {
 			if va == NO_VERTEX {
-				va = Vertex{xr, fm*xr + fb}
+				va = Vertex{X:xr, Y: fm*xr + fb}
 			} else if va.X < xl {
 				return false
 			}
-			vb = Vertex{xl, fm*xl + fb}
+			vb = Vertex{X:xl,Y: fm*xl + fb}
 		}
 	}
 	edge.Va.Vertex = va
@@ -795,7 +794,7 @@ func clipEdge(edge *Edge, bbox BBox) bool {
 	// than modifying the existing one, since the existing
 	// one is likely shared with at least another edge
 	if t0 > 0 {
-		edge.Va.Vertex = Vertex{ax + t0*dx, ay + t0*dy}
+		edge.Va.Vertex = Vertex{X:ax + t0*dx,Y: ay + t0*dy}
 	}
 
 	// if t1 < 1, vb needs to change
@@ -803,7 +802,7 @@ func clipEdge(edge *Edge, bbox BBox) bool {
 	// than modifying the existing one, since the existing
 	// one is likely shared with at least another edge
 	if t1 < 1 {
-		edge.Vb.Vertex = Vertex{ax + t1*dx, ay + t1*dy}
+		edge.Vb.Vertex = Vertex{X:ax + t1*dx,Y: ay + t1*dy}
 	}
 
 	return true
@@ -884,31 +883,31 @@ func (s *Voronoi) closeCells(bbox BBox) {
 				// walk downward along left side
 				if equalWithEpsilon(endpoint.X, xl) && lessThanWithEpsilon(endpoint.Y, yb) {
 					if equalWithEpsilon(startpoint.X, xl) {
-						vb = Vertex{xl, startpoint.Y}
+						vb = Vertex{X:xl,Y: startpoint.Y}
 					} else {
-						vb = Vertex{xl, yb}
+						vb = Vertex{X:xl, Y:yb}
 					}
 
 					// walk rightward along bottom side
 				} else if equalWithEpsilon(endpoint.Y, yb) && lessThanWithEpsilon(endpoint.X, xr) {
 					if equalWithEpsilon(startpoint.Y, yb) {
-						vb = Vertex{startpoint.X, yb}
+						vb = Vertex{X:startpoint.X, Y: yb}
 					} else {
-						vb = Vertex{xr, yb}
+						vb = Vertex{X:xr,Y: yb}
 					}
 					// walk upward along right side
 				} else if equalWithEpsilon(endpoint.X, xr) && greaterThanWithEpsilon(endpoint.Y, yt) {
 					if equalWithEpsilon(startpoint.X, xr) {
-						vb = Vertex{xr, startpoint.Y}
+						vb = Vertex{X:xr,Y: startpoint.Y}
 					} else {
-						vb = Vertex{xr, yt}
+						vb = Vertex{X:xr, Y:yt}
 					}
 					// walk leftward along top side
 				} else if equalWithEpsilon(endpoint.Y, yt) && greaterThanWithEpsilon(endpoint.X, xl) {
 					if equalWithEpsilon(startpoint.Y, yt) {
-						vb = Vertex{startpoint.X, yt}
+						vb = Vertex{X:startpoint.X, Y:yt}
 					} else {
-						vb = Vertex{xl, yt}
+						vb = Vertex{X:xl, Y:yt}
 					}
 				} else {
 					//			break
@@ -920,7 +919,7 @@ func (s *Voronoi) closeCells(bbox BBox) {
 				halfedges = cell.Halfedges
 				nHalfedges = len(halfedges)
 
-				copy(halfedges[iLeft+2:len(halfedges)], halfedges[iLeft+1:len(halfedges)-1])
+				copy(halfedges[iLeft+2:], halfedges[iLeft+1:len(halfedges)-1])
 				halfedges[iLeft+1] = newHalfedge(edge, cell, nil)
 
 			}
